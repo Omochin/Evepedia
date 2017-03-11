@@ -61,9 +61,9 @@ def import_fsd():
 
         return data
     
-    categoryIDs = load_yaml('./sde/categoryIDs.yaml')    
-    groupIDs = load_yaml('./sde/groupIDs.yaml')
-    typeIDs = load_yaml('./sde/typeIDs.yaml')    
+    categoryIDs = load_yaml('./fsd/categoryIDs.yaml')    
+    groupIDs = load_yaml('./fsd/groupIDs.yaml')
+    typeIDs = load_yaml('./fsd/typeIDs.yaml')    
         
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)        
