@@ -8,6 +8,23 @@ import collections
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
+
+# CategoryID: 18, GroupID:  101 - Mining Drone
+# CategoryID: 22, GroupID:  361 - Mobile Warp Disruptor
+# CategoryID: 22, GroupID: 1249 - Mobile Cyno Inhibitor 
+# CategoryID: 22, GroupID: 1250 - Mobile Tractor Unit
+# CategoryID: 23, GroupID:  365 - Control Tower
+# CategoryID: 23, GroupID:  404 - Silo
+# CategoryID: 23, GroupID:  444 - Shield Hardening Array
+# CategoryID: 23, GroupID:  839 - Cynosural System Jammer
+# CategoryID: 23, GroupID: 1282 - Compression Array
+# CategoryID: 46, GroupID: 1025 - Orbital Infrastructure
+# CategoryID: 65, GroupID: 1404 - Engineering Complex
+# CategoryID: 65, GroupID: 1406 - Refinery
+# CategoryID: 65, GroupID: 1657 - Citadel
+# CategoryID: 87, GroupID: 1652 - Light Fighter 
+
+
 LCID = collections.OrderedDict(
     en='English',
     ja='Japanese',
@@ -188,15 +205,24 @@ if len(sys.argv) > 1:
     if sys.argv[1] == '--import':
         import_fsd()
 else:
-    for path in ['./docs/', './docs/category/', './docs/group/', './docs/type/']:
-        if not os.path.isdir(path):
-            os.mkdir(path)
+    for path in ['./docs/category/', './docs/group/', './docs/type/']:
+        if os.path.isdir(path):
+            shutil.rmtree(path)
 
+        os.mkdir(path)
         shutil.copy('./evepedia.css',  path + 'evepedia.css')
         shutil.copy('./favicon.jpg',  path + 'favicon.jpg')
 
     rows = []
-    for category_id in [6, 7, 8, 16, 20, 32]:    
+    base_categories = [
+        6,  # Ship
+        7,  # Module
+        8,  # Charge
+        16, # Skill
+        20, # Implant
+        32, # Subsystem
+    ]
+    for category_id in [6, 18, 22, 23, 46, 65, 87]:
         category = session.query(Category).filter_by(id=category_id).one()
         locale = json2locale(category.name)
         locale['id'] = category_id
