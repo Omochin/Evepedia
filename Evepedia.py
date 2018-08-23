@@ -115,7 +115,9 @@ def json2locale(text):
 
 
 def write_html(name, title, body):
-    html = '<!DOCTYPE html><html><head><title>' + title + '</title><meta charset="UTF-8"><link rel="stylesheet" type="text/css" href="./evepedia.css"></head><body>'
+    html = '<!DOCTYPE html><html><head><title>' + title + '</title><meta charset="UTF-8"><link rel="stylesheet" type="text/css" href="./evepedia.css">'
+    html += '<link rel="shortcut icon" type="image/jpg" href="favicon.jpg">'
+    html += '</head><body>'
     html += body
     html += '</body></html>'
 
@@ -139,29 +141,6 @@ def locales_table(path, rows):
                 html += '<td>' + name + '</td>'
 
         html += '</tr>'
-
-        # columns = list(dict.values())
-        # name = columns.pop(0)
-        # html += '<td><a href="' + path + name + '.html">' + name + '</a></td>'
-
-        # for column in columns:
-        #     html += '<td>' + column + '</td>'
-
-        # html += '</tr>'
-
-#    for key, columns in row.items():
-
-        # print(key)
-        # html += '<tr>'
-
-        # columns = list(dict.values())
-        # name = columns.pop(0)
-        # html += '<td><a href="' + path + name + '.html">' + name + '</a></td>'
-
-        # for column in columns:
-        #     html += '<td>' + column + '</td>'
-
-        # html += '</tr>'
 
     html += '</table>'
     return html
@@ -214,6 +193,7 @@ else:
             os.mkdir(path)
 
         shutil.copy('./evepedia.css',  path + 'evepedia.css')
+        shutil.copy('./favicon.jpg',  path + 'favicon.jpg')
 
     rows = []
     for category_id in [6, 7, 8, 16, 20, 32]:    
