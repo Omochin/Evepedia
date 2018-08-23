@@ -99,18 +99,19 @@ def import_fsd():
 
 
 def json2locale(text):
-    dict = collections.OrderedDict()
+    dict_ = collections.OrderedDict()
     json_dict = json.loads(text)
-    
-    for id in LCID.keys():
-        try:
-            dict[id] = json_dict[id]
-        except KeyError:
-            dict[id] = json_dict['en']
-        except:
-            dict[id] = ''
 
-    return dict
+    dict_['id'] = ''
+    for key_ in LCID.keys(): 
+        if key_ in json_dict:
+            dict_[key_] = json_dict[key_]
+        elif 'en' in json_dict:
+            dict_[key_] = json_dict['en']
+        else:
+            dict_[key_] = ''                
+
+    return dict_
 
 
 def write_html(name, title, body):
@@ -122,62 +123,85 @@ def write_html(name, title, body):
         f.write(html)
 
 
-def locales_table(path, row):
-    html = '<table><tr>'
+def locales_table(path, rows):
+    html = '<table><tr><th>ID</th>'
     for locale_name in LCID.values():
         html += '<th>' + locale_name + '</th>'
     html += '</tr>'
 
-    for dict in row:
+    for row in rows:
         html += '<tr>'
 
-        columns = list(dict.values())
-        name = columns.pop(0)
-        html += '<td><a href="' + path + name + '.html">' + name + '</a></td>'
-
-        for column in columns:
-            html += '<td>' + column + '</td>'
+        for lcid, name in row.items():
+            if lcid == 'id':
+                html += '<td><a href="%s%d.html">%d</a></td>' % (path, name, name)
+            else:
+                html += '<td>' + name + '</td>'
 
         html += '</tr>'
+
+        # columns = list(dict.values())
+        # name = columns.pop(0)
+        # html += '<td><a href="' + path + name + '.html">' + name + '</a></td>'
+
+        # for column in columns:
+        #     html += '<td>' + column + '</td>'
+
+        # html += '</tr>'
+
+#    for key, columns in row.items():
+
+        # print(key)
+        # html += '<tr>'
+
+        # columns = list(dict.values())
+        # name = columns.pop(0)
+        # html += '<td><a href="' + path + name + '.html">' + name + '</a></td>'
+
+        # for column in columns:
+        #     html += '<td>' + column + '</td>'
+
+        # html += '</tr>'
 
     html += '</table>'
     return html
 
 
-def read_type(name, type):
-    print(name)
+def read_type(name, type_):
     html = '<table><tr><th></th><th>Name</th><th>Description</th></tr>'
-    names = json2locale(type.name)
-    descriptions = json2locale(type.description)
-    for id, lc_name in LCID.items():
+    names = json2locale(type_.name)
+    descriptions = json2locale(type_.description)
+    for id_, lc_name in LCID.items():
         html += '<tr><td>' + lc_name + '</td>'
-        html += '<td>' + names[id] + '</td>'
-        html += '<td>' + descriptions[id] + '</td></tr>'
+        html += '<td>' + names[id_] + '</td>'
+        html += '<td>' + descriptions[id_] + '</td></tr>'
     html += '</table>'
 
-    write_html('type/' + name, name, html)
+    write_html('type/%d' % type_.id, name, html)
 
 
 def read_group(name, group):
-    row = []
-    for type in group.types:
-        locale = json2locale(type.name)
-        row.append(locale)
+    rows = []
+    for type_ in group.types:
+        locale = json2locale(type_.name)
+        locale['id'] = type_.id
+        rows.append(locale)
 
-        read_type(locale['en'], type)
+        read_type(locale['en'], type_)
 
-    write_html('group/' + name, name, locales_table('../type/', row))
+    write_html('group/%d' % group.id, name, locales_table('../type/', rows))
 
 
 def read_category(name, category):
-    row = []
+    rows = []
     for group in category.groups:
         locale = json2locale(group.name)
-        row.append(locale)
+        locale['id'] = group.id
+        rows.append(locale)
 
         read_group(locale['en'], group)
 
-    write_html('category/' + name, name, locales_table('../group/', row))
+    write_html('category/%d' % category.id, name, locales_table('../group/', rows))
 
 
 
@@ -191,12 +215,13 @@ else:
 
         shutil.copy('./evepedia.css',  path + 'evepedia.css')
 
-    row = []
+    rows = []
     for category_id in [6, 7, 8, 16, 20, 32]:    
         category = session.query(Category).filter_by(id=category_id).one()
         locale = json2locale(category.name)
-        row.append(locale)
+        locale['id'] = category_id
+        rows.append(locale)
 
         read_category(locale['en'], category)
 
-    write_html('index', 'Evepedia', locales_table('./category/', row))
+    write_html('index', 'Evepedia', locales_table('./category/', rows))
